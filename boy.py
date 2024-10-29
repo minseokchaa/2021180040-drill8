@@ -1,6 +1,6 @@
 from pico2d import load_image, get_time
 
-from state_machine import StateMachine, time_out,  right_down, left_down, left_up, right_up, a_down, start_event
+from state_machine import StateMachine, time_out,  right_down, left_down, a_down, start_event
 
 
 # 상태를 클래스를 통해서 정의함
@@ -34,9 +34,9 @@ class Run:
     @staticmethod
     def enter(boy,e):
 
-        if right_down(e) or left_up(e):
+        if right_down(e):
              boy.dir,boy.action = 1, 1
-        elif left_down(e) or right_up(e):
+        elif left_down(e):
             boy.dir, boy.action = -1, 0
         boy.frame = 0
         pass
