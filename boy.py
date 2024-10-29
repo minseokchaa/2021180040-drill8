@@ -1,6 +1,6 @@
 from pico2d import load_image, get_time
 
-from state_machine import StateMachine, right_down, left_down, left_up, right_up, start_event
+from state_machine import StateMachine, time_out,  right_down, left_down, left_up, right_up, a_down, start_event
 
 
 # 상태를 클래스를 통해서 정의함
@@ -49,7 +49,7 @@ class Run:
 
     @staticmethod
     def do(boy):
-        boy.x += boy.dir*5
+        boy.x += boy.dir*2
         boy.frame = (boy.frame+1)%8
         pass
 
@@ -63,6 +63,10 @@ class Run:
 class AutoRun:
     @staticmethod
     def enter(boy, e):
+        boy.start_time = get_time()
+        if a_down(e):
+             boy.dir,boy.action = 1, 1
+        boy.frame = 0
         pass
 
     @staticmethod
@@ -71,11 +75,19 @@ class AutoRun:
 
     @staticmethod
     def do(boy):
+        boy.x += boy.dir * 5
+        boy.frame = (boy.frame + 1) % 8
+        if get_time() - boy.start_time > 1:
+            boy.state_machine.add_event(('TIME_OUT',0))
         pass
 
     @staticmethod
     def draw(boy):
+        boy.image.clip_draw(
+            boy.frame * 100, boy.action * 100, 100, 100, boy.x, boy.y+20,150,150
+        )
         pass
+
 class Boy:
     def __init__(self):
         self.x, self.y = 400, 90
@@ -84,12 +96,14 @@ class Boy:
         self.face_dir = 1
         self.action = 3
         self.image = load_image('animation_sheet.png')
+        self.start_time = get_time()
         self.state_machine = StateMachine(self) #소년 객체의 state machine 생성
         self.state_machine.start(Idle)      #초기 상태 -- Idle
         self.state_machine.set_transitions(
             {
-                Run: {right_down: Idle, left_down: Idle, right_up: Idle, left_up: Idle},    #run상태에서 어떠한 이벤트가 들어와도 처리하지 않겠다.
-                Idle : {right_down: Run, left_down: Run, left_up: Run, right_up: Run}
+                Run: {},                        #run상태에서 어떠한 이벤트가 들어와도 처리하지 않겠다.
+                Idle : {a_down: AutoRun},
+                AutoRun: {right_down: Run, left_down: Run, time_out: Idle}
             }
         )
 
