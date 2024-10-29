@@ -1,6 +1,6 @@
 from pico2d import load_image, get_time
 
-from state_machine import StateMachine, space_down, time_out, right_down, left_down, left_up, right_up, start_event
+from state_machine import StateMachine, right_down, left_down, left_up, right_up, start_event
 
 
 # 상태를 클래스를 통해서 정의함
@@ -24,8 +24,6 @@ class Idle:
     @staticmethod
     def do(boy):
         boy.frame = (boy.frame + 1) % 8
-        if get_time() - boy.start_time > 2:
-            boy.state_machine.add_event(('TIME_OUT',0))
         pass
 
     @staticmethod
@@ -33,40 +31,6 @@ class Idle:
         boy.image.clip_draw(boy.frame * 100, boy.action * 100, 100, 100, boy.x, boy.y)
 
         pass
-
-class Sleep:
-    @staticmethod
-    def enter(boy,e):
-        if right_down(e) or left_up(e):
-             boy.dir,boy.action = 1, 1
-        elif left_down(e) or right_up(e):
-            boy.dir, boy.action = -1, 0
-        pass
-
-    @staticmethod
-    def exit(boy,e):
-        pass
-
-    @staticmethod
-    def do(boy):
-        boy.frame = (boy.frame + 1) % 8
-
-    @staticmethod
-    def draw(boy):
-        if boy.face_dir ==1:
-            boy.image.clip_composite_draw(
-                boy.frame *100, 300, 100, 100,
-                3.141592/2, # 90도 회전
-                '', # 좌우상하 반전 X
-                boy.x - 25, boy.y - 25, 100, 100
-            )
-        elif boy.face_dir ==-1:
-            boy.image.clip_composite_draw(
-                boy.frame *100, 200, 100, 100,
-                -3.141592/2, # 90도 회전
-                '', # 좌우상하 반전 X
-                boy.x+25 , boy.y-25 , 100, 100
-            )
 
 class Run:
     @staticmethod
@@ -120,14 +84,12 @@ class Boy:
         self.face_dir = 1
         self.action = 3
         self.image = load_image('animation_sheet.png')
-        self.start_time = get_time()
         self.state_machine = StateMachine(self) #소년 객체의 state machine 생성
         self.state_machine.start(Idle)      #초기 상태 -- Idle
         self.state_machine.set_transitions(
             {
                 Run: {right_down: Idle, left_down: Idle, right_up: Idle, left_up: Idle},    #run상태에서 어떠한 이벤트가 들어와도 처리하지 않겠다.
-                Idle : {right_down: Run, left_down: Run, left_up: Run, right_up: Run, time_out : Sleep},
-                Sleep : {right_down: Run, left_down: Run, left_up: Run, right_up: Run, space_down: Idle}
+                Idle : {right_down: Run, left_down: Run, left_up: Run, right_up: Run}
             }
         )
 

@@ -24,9 +24,6 @@ def left_up(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_LEFT
 
 
-def time_out(e):         #e가 time out인지 판단
-    return e[0] == 'TIME_OUT'
-
 
 
 
