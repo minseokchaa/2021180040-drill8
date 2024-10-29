@@ -13,6 +13,7 @@ class Idle:
         elif boy.face_dir == -1:
             boy.action = 2
         boy.frame = 0
+        boy.dir = 0
         pass
 
     @staticmethod
