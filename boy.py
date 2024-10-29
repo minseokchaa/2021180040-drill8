@@ -7,13 +7,11 @@ from state_machine import StateMachine, time_out,  right_down, left_down, left_u
 class Idle:
     @staticmethod  # @는 데코레이터라는 기능, 클래스 안에 들어있는 객채하곤 상관이 없는 함수, 모아 놓는 개념?
     def enter(boy,e):
-        boy.start_time = get_time()
-        if right_up(e) or left_down(e) or start_event(e):
+        if boy.face_dir == 1:
             boy.action = 3
-            boy.face_dir = 1
-        elif left_up(e) or right_down(e):
+
+        elif boy.face_dir == -1:
             boy.action = 2
-            boy.face_dir = -1
         boy.frame = 0
         pass
 
@@ -64,8 +62,14 @@ class AutoRun:
     @staticmethod
     def enter(boy, e):
         boy.start_time = get_time()
-        if a_down(e):
-             boy.dir,boy.action = 1, 1
+
+        if boy.face_dir ==1:
+            boy.dir = 1
+            boy.action = 1
+        if boy.face_dir == -1:
+            boy.dir = -1
+            boy.action = 0
+
         boy.frame = 0
         pass
 
@@ -77,8 +81,18 @@ class AutoRun:
     def do(boy):
         boy.x += boy.dir * 5
         boy.frame = (boy.frame + 1) % 8
-        if get_time() - boy.start_time > 1:
+        if get_time() - boy.start_time > 5:
             boy.state_machine.add_event(('TIME_OUT',0))
+
+        if boy.x + boy.dir*5 > 800: #왼쪽으로 방향 전환
+            boy.dir = -1
+            boy.face_dir =-1
+            boy.action = 0
+
+        if boy.x + boy.dir*5 < 0:   #오른쪽으로 방향전환
+            boy.dir = 1
+            boy.face_dir = 1
+            boy.action = 1
         pass
 
     @staticmethod
