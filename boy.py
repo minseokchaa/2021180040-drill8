@@ -47,8 +47,18 @@ class Run:
 
     @staticmethod
     def do(boy):
-        boy.x += boy.dir*2
+        boy.x += boy.dir*5
         boy.frame = (boy.frame+1)%8
+
+        if boy.x + boy.dir*5 > 800: #왼쪽으로 방향 전환
+            boy.dir = -1
+            boy.face_dir =-1
+            boy.action = 0
+
+        if boy.x + boy.dir*5 < 0:   #오른쪽으로 방향전환
+            boy.dir = 1
+            boy.face_dir = 1
+            boy.action = 1
         pass
 
     @staticmethod
@@ -79,7 +89,7 @@ class AutoRun:
 
     @staticmethod
     def do(boy):
-        boy.x += boy.dir * 5
+        boy.x += boy.dir * 10
         boy.frame = (boy.frame + 1) % 8
         if get_time() - boy.start_time > 5:
             boy.state_machine.add_event(('TIME_OUT',0))
